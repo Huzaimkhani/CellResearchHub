@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { createServer as createViteServer, createLogger } from "vite";
 import { type Server } from "http";
-import viteConfig from "../vite.config";
+import viteConfig from "../vite.config.ts"; // Fixed import
 import { nanoid } from "nanoid";
 
 const viteLogger = createLogger();
@@ -45,14 +45,13 @@ export async function setupVite(app: Express, server: Server) {
     const url = req.originalUrl;
 
     try {
-      const clientTemplate = path.resolve(
-        import.meta.dirname,
-        "..",
+      // Fixed path resolution for Vercel
+      const clientTemplate = path.join(
+        process.cwd(),
         "client",
-        "index.html",
+        "index.html"
       );
 
-      // always reload the index.html file from disk incase it changes
       let template = await fs.promises.readFile(clientTemplate, "utf-8");
       template = template.replace(
         `src="/src/main.tsx"`,
@@ -68,18 +67,18 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  const distPath = path.resolve(import.meta.dirname, "..", "dist", "public");
+  // Fixed path resolution for production
+  const distPath = path.join(process.cwd(), "dist", "public");
 
-  if (!fs.existsSync(distPath)) {
+  if (!fs.existsSync(distPath) && process.env.NODE_ENV === "production") {
     throw new Error(
-      `Could not find the build directory: ${distPath}, run 'npm run build' first`,
+      `Could not find build directory: ${distPath}, run 'npm run build' first`
     );
   }
 
   app.use(express.static(distPath));
 
-  // fall through to index.html if the file doesn't exist
   app.use("*", (_req, res) => {
-    res.sendFile(path.resolve(distPath, "index.html"));
+    res.sendFile(path.join(distPath, "index.html"));
   });
 }
