@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Helmet } from "react-helmet";
+import  Helmet  from "react-helmet";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, User, Briefcase, Stethoscope, CheckCircle, XCircle } from "lucide-react";
 
@@ -74,7 +74,8 @@ const Sponsors = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev: any) => ({ ...prev, [name]: value }));
+
     
     // Clear error when user starts typing
     if (formErrors[name]) {
